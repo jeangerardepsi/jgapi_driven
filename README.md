@@ -9,9 +9,9 @@
 
 ## 👤 Informations Étudiant
 > [!IMPORTANT]
-> **Nom :** Jean-Gérard  
-> **Filière :** Infra ESI_EPSI  
-> **Année Académique :** 2025-2026  
+> **Nom :** Jean-Gérard  
+> **Filière :** Infra ESI_EPSI  
+> **Année Académique :** 2025-2026  
 > **Intervenant :** **Boris STOCKER**
 
 ---
@@ -34,8 +34,8 @@ aws configure # (test / test / us-east-1)
 
 # Lancement de l'instance avec l'AMI par défaut de LocalStack
 aws --endpoint-url=http://localhost:4566 ec2 run-instances \
-    --image-id ami-df5de72bdb3b \
-    --count 1 --instance-type t2.micro
+    --image-id ami-df5de72bdb3b \
+    --count 1 --instance-type t2.micro
 # ID Instance obtenu : i-51f8a34f64ad0e1e8
 \`\`\`
 
@@ -47,33 +47,33 @@ import os
 import json
 
 def lambda_handler(event, context):
-    # Correction réseau : Utilisation du hostname dynamique de LocalStack
-    localstack_hostname = os.environ.get('LOCALSTACK_HOSTNAME')
-    endpoint_url = f"http://{localstack_hostname}:4566" if localstack_hostname else "http://localhost:4566"
-    
-    ec2 = boto3.client('ec2', endpoint_url=endpoint_url, region_name='us-east-1')
-    instance_id = 'i-51f8a34f64ad0e1e8'
-    
-    # Récupération de l'action via les paramètres d'URL (?action=xxx)
-    action = event.get('queryStringParameters', {}).get('action', 'status')
-    
-    if action == 'start':
-        ec2.start_instances(InstanceIds=[instance_id])
-        message = "Demarrage envoye"
-    elif action == 'stop':
-        ec2.stop_instances(InstanceIds=[instance_id])
-        message = "Arret envoye"
-    else:
-        # Action par défaut : Status
-        response = ec2.describe_instances(InstanceIds=[instance_id])
-        state = response['Reservations'][0]['Instances'][0]['State']['Name']
-        message = f"Statut: {state}"
+    # Correction réseau : Utilisation du hostname dynamique de LocalStack
+    localstack_hostname = os.environ.get('LOCALSTACK_HOSTNAME')
+    endpoint_url = f"http://{localstack_hostname}:4566" if localstack_hostname else "http://localhost:4566"
+    
+    ec2 = boto3.client('ec2', endpoint_url=endpoint_url, region_name='us-east-1')
+    instance_id = 'i-51f8a34f64ad0e1e8'
+    
+    # Récupération de l'action via les paramètres d'URL (?action=xxx)
+    action = event.get('queryStringParameters', {}).get('action', 'status')
+    
+    if action == 'start':
+        ec2.start_instances(InstanceIds=[instance_id])
+        message = "Demarrage envoye"
+    elif action == 'stop':
+        ec2.stop_instances(InstanceIds=[instance_id])
+        message = "Arret envoye"
+    else:
+        # Action par défaut : Status
+        response = ec2.describe_instances(InstanceIds=[instance_id])
+        state = response['Reservations'][0]['Instances'][0]['State']['Name']
+        message = f"Statut: {state}"
 
-    return {
-        'statusCode': 200,
-        'headers': {'Content-Type': 'application/json'},
-        'body': json.dumps({'message': message, 'instance': instance_id})
-    }
+    return {
+        'statusCode': 200,
+        'headers': {'Content-Type': 'application/json'},
+        'body': json.dumps({'message': message, 'instance': instance_id})
+    }
 \`\`\`
 
 ### 3️⃣ CODE FINAL : Makefile
@@ -107,3 +107,9 @@ status:
 
 ---
 *Dépôt finalisé et archivé pour évaluation finale.*
+
+*git add README.md Makefile lambda_function.py*
+*git commit -m "Final submission: Including full code in README"*
+*git push*
+
+
