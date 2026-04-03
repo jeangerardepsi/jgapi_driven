@@ -39,8 +39,8 @@ aws --endpoint-url=http://localhost:4566 ec2 run-instances \
 # ID Instance obtenu : i-51f8a34f64ad0e1e8
 \`\`\`
 
-### 2️⃣ Logique Applicative : lambda_function.py (Code Complet)
-Le script gère la communication interne et les actions de pilotage :
+### 2️⃣ CODE FINAL : lambda_function.py
+Ce script est le cœur de l'automatisation. Il gère la communication interne et les actions de pilotage :
 \`\`\`python
 import boto3
 import os
@@ -54,6 +54,7 @@ def lambda_handler(event, context):
     ec2 = boto3.client('ec2', endpoint_url=endpoint_url, region_name='us-east-1')
     instance_id = 'i-51f8a34f64ad0e1e8'
     
+    # Récupération de l'action via les paramètres d'URL (?action=xxx)
     action = event.get('queryStringParameters', {}).get('action', 'status')
     
     if action == 'start':
@@ -63,6 +64,7 @@ def lambda_handler(event, context):
         ec2.stop_instances(InstanceIds=[instance_id])
         message = "Arret envoye"
     else:
+        # Action par défaut : Status
         response = ec2.describe_instances(InstanceIds=[instance_id])
         state = response['Reservations'][0]['Instances'][0]['State']['Name']
         message = f"Statut: {state}"
@@ -74,8 +76,8 @@ def lambda_handler(event, context):
     }
 \`\`\`
 
-### 3️⃣ Industrialisation : Makefile (Code Complet)
-Automatisation du cycle de vie du projet pour Boris Stocker :
+### 3️⃣ CODE FINAL : Makefile
+Automatisation du cycle de vie du projet :
 \`\`\`makefile
 deploy:
 	zip function.zip lambda_function.py
@@ -88,7 +90,7 @@ status:
 
 ---
 
-## 🔗 Pilotage en Direct (Endpoints)
+## 🔗 Endpoints Live (Pilotage)
 
 | Action | Description | Lien de contrôle |
 | :--- | :--- | :--- |
@@ -100,7 +102,7 @@ status:
 
 ## 💡 Résolution de Problèmes (Post-Mortem)
 * **Réseau :** L'erreur `ConnectionRefused` a été corrigée via `LOCALSTACK_HOSTNAME`.
-* **Git :** Un **Fork** a été réalisé sur `jeangerardepsi/jgapi_driven` pour finaliser le push suite à des erreurs de droits.
+* **Git :** Un **Fork** a été réalisé sur `jeangerardepsi/jgapi_driven` pour finaliser le push.
 * **Affichage :** Les réponses sont au format **JSON**, confirmées par la donnée brute en navigateur.
 
 ---
