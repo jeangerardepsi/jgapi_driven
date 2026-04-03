@@ -13,38 +13,39 @@
 
 ## 🚀 RÉCAPITULATIF COMPLET DES COMMANDES EXÉCUTÉES
 
-Voici l'historique technique de mon travail, incluant la résolution des erreurs rencontrées.
+Voici l'intégralité du code et des commandes utilisés pour ce projet.
 
-### 1️⃣ Initialisation et Configuration AWS
-J'ai configuré les identifiants locaux pour communiquer avec LocalStack :
+### 1️⃣ Initialisation de l'Infrastructure (AWS CLI)
+Commandes tapées pour configurer l'environnement et créer l'instance :
 \`\`\`bash
+# Configuration des accès
 aws configure
-# Access Key: test | Secret Key: test | Region: us-east-1
+# (test / test / us-east-1)
+
+# Création de l'instance EC2 (avec AMI par défaut LocalStack)
+aws --endpoint-url=http://localhost:4566 ec2 run-instances \
+    --image-id ami-df5de72bdb3b \
+    --count 1 \
+    --instance-type t2.micro
+# ID obtenu : i-51f8a34f64ad0e1e8
 \`\`\`
 
-### 2️⃣ Création de l'instance EC2 (Gestion de l'erreur d'AMI)
-Au début, j'ai eu une erreur d'AMI non trouvée. J'ai dû identifier l'AMI par défaut de LocalStack pour réussir le provisioning :
-\`\`\`bash
-# Commande réussie pour créer l'instance :
-aws --endpoint-url=http://localhost:4566 ec2 run-instances --image-id ami-df5de72bdb3b --count 1 --instance-type t2.micro
-# Instance ID obtenue : i-51f8a34f64ad0e1e8
-\`\`\`
-
-### 3️⃣ Développement de la Lambda (Correction du Réseau)
-Ma première version du code Python échouait car elle pointait sur \`localhost\`. J'ai dû modifier le code pour utiliser le réseau interne de LocalStack :
+### 2️⃣ Code Source Complet : lambda_function.py
+Ce code gère les requêtes HTTP et communique avec l'API EC2 de LocalStack :
 \`\`\`python
 import boto3
 import os
 import json
 
 def lambda_handler(event, context):
-    # Correction de l'endpoint pour le réseau interne LocalStack
+    # Gestion du réseau interne pour LocalStack
     localstack_hostname = os.environ.get('LOCALSTACK_HOSTNAME')
     endpoint_url = f"http://{localstack_hostname}:4566" if localstack_hostname else "http://localhost:4566"
     
     ec2 = boto3.client('ec2', endpoint_url=endpoint_url, region_name='us-east-1')
     instance_id = 'i-51f8a34f64ad0e1e8'
     
+    # Récupération de l'action via les paramètres d'URL (?action=xxx)
     action = event.get('queryStringParameters', {}).get('action', 'status')
     
     if action == 'start':
@@ -60,31 +61,36 @@ def lambda_handler(event, context):
 
     return {
         'statusCode': 200,
+        'headers': {'Content-Type': 'application/json'},
         'body': json.dumps({'message': message, 'instance': instance_id})
     }
 \`\`\`
 
-### 4️⃣ Déploiement et Automatisation (Makefile)
-Pour automatiser la mise à jour, j'ai créé un **Makefile** :
+### 3️⃣ Automatisation : Makefile Complet
+Contenu du fichier Makefile utilisé pour simplifier les opérations :
 \`\`\`makefile
 deploy:
 	zip function.zip lambda_function.py
-	aws --endpoint-url=http://localhost:4566 lambda update-function-code --function-name ec2-manager --zip-file fileb://function.zip --region us-east-1
+	aws --endpoint-url=http://localhost:4566 lambda update-function-code \
+		--function-name ec2-manager --zip-file fileb://function.zip --region us-east-1
+
+status:
+	curl "https://automatic-palm-tree-r4v47xjpq97r3p9rw-4566.app.github.dev/?action=status"
 \`\`\`
-**Commande lancée :** \`make deploy\`
-
-### 5️⃣ Tests de l'API (Endpoints Live)
-L'API est exposée via le tunnel GitHub Codespaces :
-* **Vérifier le Statut** : [Lien Statut](https://automatic-palm-tree-r4v47xjpq97r3p9rw-4566.app.github.dev/?action=status)
-* **Démarrer** : [Lien Start](https://automatic-palm-tree-r4v47xjpq97r3p9rw-4566.app.github.dev/?action=start)
-* **Arrêter** : [Lien Stop](https://automatic-palm-tree-r4v47xjpq97r3p9rw-4566.app.github.dev/?action=stop)
 
 ---
 
-## 📝 Analyse des Erreurs & Solutions
-1. **Erreur d'accès Git** : Résolution en créant un **Fork** sur mon compte personnel pour obtenir les droits d'écriture.
-2. **Page Blanche Navigateur** : Confirmation que le JSON brut ne génère pas de visuel, mais transmet bien la donnée.
-3. **Erreur 502** : Résolue en paramétrant la visibilité des ports du Codespace en **Public**.
+## 🔗 Endpoints Live (Pilotage)
+* **🔍 Statut** : [Cliquer ici](https://automatic-palm-tree-r4v47xjpq97r3p9rw-4566.app.github.dev/?action=status)
+* **▶️ Démarrer** : [Cliquer ici](https://automatic-palm-tree-r4v47xjpq97r3p9rw-4566.app.github.dev/?action=start)
+* **⏹️ Stopper** : [Cliquer ici](https://automatic-palm-tree-r4v47xjpq97r3p9rw-4566.app.github.dev/?action=stop)
 
 ---
-*Projet réalisé et documenté avec succès par Jean-Gérard pour Boris STOCKER.*
+
+## 📝 Rapport d'erreurs et Solutions
+1. **Erreur d'AMI** : Résolue en switchant sur `ami-df5de72bdb3b`.
+2. **Erreur Réseau Lambda** : Résolue via `LOCALSTACK_HOSTNAME` (indispensable pour que la Lambda "sorte" de son container).
+3. **Droits Git** : Résolu par la création d'un Fork personnel pour finaliser le push.
+
+---
+*Dépôt finalisé et fonctionnel.*
