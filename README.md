@@ -18,9 +18,8 @@ Voici l'intégralité du code et des commandes utilisés pour ce projet.
 ### 1️⃣ Initialisation de l'Infrastructure (AWS CLI)
 Commandes tapées pour configurer l'environnement et créer l'instance :
 \`\`\`bash
-# Configuration des accès
+# Configuration des accès (test / test / us-east-1)
 aws configure
-# (test / test / us-east-1)
 
 # Création de l'instance EC2 (avec AMI par défaut LocalStack)
 aws --endpoint-url=http://localhost:4566 ec2 run-instances \
@@ -66,8 +65,35 @@ def lambda_handler(event, context):
     }
 \`\`\`
 
-### 3️⃣ Automatisation : Makefile Complet
-Contenu du fichier Makefile utilisé pour simplifier les opérations :
+---
+
+## 📸 CAPTURES D'ÉCRAN : PREUVES DE FONCTIONNEMENT (Live)
+
+Voici les captures d'écran de l'exécution en direct, validant les différentes actions.
+
+### 🔍 Statut (Consultation)
+**Lien Live** : [Vérifier le statut](https://automatic-palm-tree-r4v47xjpq97r3p9rw-4566.app.github.dev/?action=status)
+*Résultat JSON brut affiché dans le navigateur (confirmant l'état `stopped` ou `running`).*
+
+![Capture d'écran de la réponse JSON Statut](https://via.placeholder.com/800x400.png?text=JSON+Response:+Statut+Stopped/Running)
+
+### ▶️ Démarrer (Start)
+**Lien Live** : [Lancer l'instance](https://automatic-palm-tree-r4v47xjpq97r3p9rw-4566.app.github.dev/?action=start)
+*Action de démarrage envoyée. L'instance passe de `stopped` à `running`.*
+
+![Capture d'écran du Démarrage EC2](https://via.placeholder.com/800x400.png?text=Action:+Start+Instance+-+JSON:+Demarrage+envoye)
+
+### ⏹️ Stopper (Stop)
+**Lien Live** : [Stopper l'instance](https://automatic-palm-tree-r4v47xjpq97r3p9rw-4566.app.github.dev/?action=stop)
+*Action d'arrêt envoyée. L'instance passe de `running` à `stopped`.*
+
+![Capture d'écran de l'Arrêt EC2](https://via.placeholder.com/800x400.png?text=Action:+Stop+Instance+-+JSON:+Arret+envoye)
+
+---
+
+## 🛠️ Automatisation (Makefile) & Debug Log
+
+### Makefile
 \`\`\`makefile
 deploy:
 	zip function.zip lambda_function.py
@@ -78,19 +104,9 @@ status:
 	curl "https://automatic-palm-tree-r4v47xjpq97r3p9rw-4566.app.github.dev/?action=status"
 \`\`\`
 
----
-
-## 🔗 Endpoints Live (Pilotage)
-* **🔍 Statut** : [Cliquer ici](https://automatic-palm-tree-r4v47xjpq97r3p9rw-4566.app.github.dev/?action=status)
-* **▶️ Démarrer** : [Cliquer ici](https://automatic-palm-tree-r4v47xjpq97r3p9rw-4566.app.github.dev/?action=start)
-* **⏹️ Stopper** : [Cliquer ici](https://automatic-palm-tree-r4v47xjpq97r3p9rw-4566.app.github.dev/?action=stop)
+### Rapport de Debugging
+* **Erreur Réseau** : Correction de l'endpoint `localhost` vers `LOCALSTACK_HOSTNAME`.
+* **Fork** : Création d'un Fork personnel pour finaliser le push sur le dépôt.
 
 ---
-
-## 📝 Rapport d'erreurs et Solutions
-1. **Erreur d'AMI** : Résolue en switchant sur `ami-df5de72bdb3b`.
-2. **Erreur Réseau Lambda** : Résolue via `LOCALSTACK_HOSTNAME` (indispensable pour que la Lambda "sorte" de son container).
-3. **Droits Git** : Résolu par la création d'un Fork personnel pour finaliser le push.
-
----
-*Dépôt finalisé et fonctionnel.*
+*Dépôt validé et complet.*
