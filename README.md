@@ -31,7 +31,7 @@ aws --endpoint-url=http://localhost:4566 ec2 run-instances --image-id ami-df5de7
 \`\`\`
 
 ### 3️⃣ Développement de la Lambda (Correction du Réseau)
-Ma première version du code Python échouait car elle pointait sur `localhost`. J'ai dû modifier le code pour utiliser le réseau interne de LocalStack :
+Ma première version du code Python échouait car elle pointait sur \`localhost\`. J'ai dû modifier le code pour utiliser le réseau interne de LocalStack :
 \`\`\`python
 import boto3
 import os
@@ -71,7 +71,7 @@ deploy:
 	zip function.zip lambda_function.py
 	aws --endpoint-url=http://localhost:4566 lambda update-function-code --function-name ec2-manager --zip-file fileb://function.zip --region us-east-1
 \`\`\`
-**Commande lancée :** `make deploy`
+**Commande lancée :** \`make deploy\`
 
 ### 5️⃣ Tests de l'API (Endpoints Live)
 L'API est exposée via le tunnel GitHub Codespaces :
@@ -82,8 +82,8 @@ L'API est exposée via le tunnel GitHub Codespaces :
 ---
 
 ## 📝 Analyse des Erreurs & Solutions
-1. **Erreur d'accès Git** : Lors du \`push\`, une erreur d'autorisation est survenue. Résolution en créant un **Fork** sur mon compte \`jeangerardepsi\` pour obtenir les droits d'écriture.
-2. **Page Blanche Navigateur** : Confirmation que le \`Content-Type: application/json\` ne génère pas de visuel HTML, mais transmet bien la donnée brute (vérifiable via l'inspecteur).
+1. **Erreur d'accès Git** : Résolution en créant un **Fork** sur mon compte personnel pour obtenir les droits d'écriture.
+2. **Page Blanche Navigateur** : Confirmation que le JSON brut ne génère pas de visuel, mais transmet bien la donnée.
 3. **Erreur 502** : Résolue en paramétrant la visibilité des ports du Codespace en **Public**.
 
 ---
