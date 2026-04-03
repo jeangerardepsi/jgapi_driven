@@ -1,83 +1,43 @@
-------------------------------------------------------------------------------------------------------
-ATELIER API-DRIVEN INFRASTRUCTURE
-------------------------------------------------------------------------------------------------------
-L’idée en 30 secondes : **Orchestration de services AWS via API Gateway et Lambda dans un environnement émulé**.  
-Cet atelier propose de concevoir une architecture **API-driven** dans laquelle une requête HTTP déclenche, via **API Gateway** et une **fonction Lambda**, des actions d’infrastructure sur des **instances EC2**, le tout dans un **environnement AWS simulé avec LocalStack** et exécuté dans **GitHub Codespaces**. L’objectif est de comprendre comment des services cloud serverless peuvent piloter dynamiquement des ressources d’infrastructure, indépendamment de toute console graphique.Cet atelier propose de concevoir une architecture API-driven dans laquelle une requête HTTP déclenche, via API Gateway et une fonction Lambda, des actions d’infrastructure sur des instances EC2, le tout dans un environnement AWS simulé avec LocalStack et exécuté dans GitHub Codespaces. L’objectif est de comprendre comment des services cloud serverless peuvent piloter dynamiquement des ressources d’infrastructure, indépendamment de toute console graphique.
-  
--------------------------------------------------------------------------------------------------------
-Séquence 1 : Codespace de Github
--------------------------------------------------------------------------------------------------------
-Objectif : Création d'un Codespace Github  
-Difficulté : Très facile (~5 minutes)
--------------------------------------------------------------------------------------------------------
-RDV sur Codespace de Github : <a href="https://github.com/features/codespaces" target="_blank">Codespace</a> **(click droit ouvrir dans un nouvel onglet)** puis créer un nouveau Codespace qui sera connecté à votre Repository API-Driven.
-  
----------------------------------------------------
-Séquence 2 : Création de l'environnement AWS (LocalStack)
----------------------------------------------------
-Objectif : Créer l'environnement AWS simulé avec LocalStack  
-Difficulté : Simple (~5 minutes)
----------------------------------------------------
+# 🚀 Projet : API Driven Infrastructure (EC2 Manager)
 
-Dans le terminal du Codespace copier/coller les codes ci-dessous etape par étape :  
+> **Étudiant :** Jean-Gérard  
+> **Environnement :** GitHub Codespaces + LocalStack  
+> **Objectif :** Piloter une instance EC2 via une architecture Serverless (Lambda + API Gateway).
 
-**Installation de l'émulateur LocalStack**  
-```
-sudo -i mkdir rep_localstack
-```
-```
-sudo -i python3 -m venv ./rep_localstack
-```
-```
-sudo -i pip install --upgrade pip && python3 -m pip install localstack && export S3_SKIP_SIGNATURE_VALIDATION=0
-```
-```
-localstack start -d
-```
-**vérification des services disponibles**  
-```
-localstack status services
-```
-**Réccupération de l'API AWS Localstack** 
-Votre environnement AWS (LocalStack) est prêt. Pour obtenir votre AWS_ENDPOINT cliquez sur l'onglet **[PORTS]** dans votre Codespace et rendez public votre port **4566** (Visibilité du port).
-Réccupérer l'URL de ce port dans votre navigateur qui sera votre ENDPOINT AWS (c'est à dire votre environnement AWS).
-Conservez bien cette URL car vous en aurez besoin par la suite.  
+---
 
-Pour information : IL n'y a rien dans votre navigateur et c'est normal car il s'agit d'une API AWS (Pas un développement Web type UX).
+### 🛠️ Étape 1 : Initialisation de l'Infrastructure
+J'ai commencé par simuler l'environnement AWS en local pour créer les ressources de base :
+* **IAM Role** : Création d'un rôle `lambda-role` avec les permissions EC2.
+* **Instance EC2** : Lancement d'une instance cible (ID: `i-51f8a34f64ad0e1e8`) basée sur l'AMI `ami-df5de72bdb3b`.
 
----------------------------------------------------
-Séquence 3 : Exercice
----------------------------------------------------
-Objectif : Piloter une instance EC2 via API Gateway
-Difficulté : Moyen/Difficile (~2h)
----------------------------------------------------  
-Votre mission (si vous l'acceptez) : Concevoir une architecture **API-driven** dans laquelle une requête HTTP déclenche, via **API Gateway** et une **fonction Lambda**, lancera ou stopera une **instance EC2** déposée dans **environnement AWS simulé avec LocalStack** et qui sera exécuté dans **GitHub Codespaces**. [Option] Remplacez l'instance EC2 par l'arrêt ou le lancement d'un Docker.  
+### 💻 Étape 2 : Développement de la Logique (Lambda)
+Le cœur de la solution est un script **Python 3.9** utilisant `boto3`. 
+* **Réseau interne** : Utilisation de `LOCALSTACK_HOSTNAME` pour permettre à la Lambda de communiquer avec l'API EC2 sans erreur de connexion.
+* **Flexibilité** : Le script analyse les paramètres d'URL (`queryStringParameters`) pour différencier les actions.
 
-**Architecture cible :** Ci-dessous, l'architecture cible souhaitée.   
-  
-![Screenshot Actions](API_Driven.png)   
-  
----------------------------------------------------  
-## Processus de travail (résumé)
+---
 
-1. Installation de l'environnement Localstack (Séquence 2)
-2. Création de l'instance EC2
-3. Création des API (+ fonction Lambda)
-4. Ouverture des ports et vérification du fonctionnement
+### 🔗 Liens de Pilotage (Live)
+*Cliquez sur les liens pour tester l'API en direct :*
 
----------------------------------------------------
-Séquence 4 : Documentation  
-Difficulté : Facile (~30 minutes)
----------------------------------------------------
-**Complétez et documentez ce fichier README.md** pour nous expliquer comment utiliser votre solution.  
-Faites preuve de pédagogie et soyez clair dans vos expliquations et processus de travail.  
-   
----------------------------------------------------
-Evaluation
----------------------------------------------------
-Cet atelier, **noté sur 20 points**, est évalué sur la base du barème suivant :  
-- Repository exécutable sans erreur majeure (4 points)
-- Fonctionnement conforme au scénario annoncé (4 points)
-- Degré d'automatisation du projet (utilisation de Makefile ? script ? ...) (4 points)
-- Qualité du Readme (lisibilité, erreur, ...) (4 points)
-- Processus travail (quantité de commits, cohérence globale, interventions externes, ...) (4 points) 
+| Action | URL du Point d'Entrée |
+| :--- | :--- |
+| **🔍 Statut** | [Vérifier l'état](https://automatic-palm-tree-r4v47xjpq97r3p9rw-4566.app.github.dev/?action=status) |
+| **▶️ Start** | [Démarrer l'EC2](https://automatic-palm-tree-r4v47xjpq97r3p9rw-4566.app.github.dev/?action=start) |
+| **⏹️ Stop** | [Stopper l'EC2](https://automatic-palm-tree-r4v47xjpq97r3p9rw-4566.app.github.dev/?action=stop) |
+
+> **💡 Note Pédagogique :** Si le navigateur affiche une page blanche, c'est normal ! L'API renvoie du **JSON brut**, format standard pour la communication entre applications.
+
+---
+
+### 🤖 Automatisation (Séquence 4)
+Pour répondre aux exigences de propreté du projet, j'ai intégré un **Makefile** qui automatise le cycle de vie :
+* `make deploy` : Re-zippe et met à jour la fonction Lambda.
+* `make status` : Teste l'API directement depuis le terminal.
+
+### 📂 Fichiers présents dans le Repository :
+* `lambda_function.py` : Code source Python.
+* `Makefile` : Scripts d'automatisation.
+* `README.md` : Documentation complète.
+* `function.zip` : Package de déploiement.
